@@ -466,142 +466,16 @@ function addDynamicMoodViz() {
   document.body.appendChild(btn3);
 }
 
-function addStaticVisCommunityMood() {
-  firebase.database().ref('robotapi/communityMood').on('value', (snap)=>{
-  console.log("moods")
-  console.log(snap.val())
-  let total = 0;
-  let data = snap.val();
-  console.log("data")
-  console.log(data)
-  console.log("total")
-  for (let i = 0; i < data.length; i++) {
-    total += data[i];
-  }
-  console.log(total)
-  console.log("low")
-  let low = (data[0] * total);
-  console.log(low)
-  console.log("med")
-  let med = (data[1] * total);
-  console.log(med)
-  console.log("high")
-  let high = (data[2] * total);
-  console.log(high)
-  console.log("arr")
-  let arr = [low, med, high];
-  console.log(arr)
-  console.log("PIE DICTIONARY")
-  let keys = Object.keys(arr);
-  let vals = Object.values(arr);
-  console.log(keys)
-  console.log(vals)
-  var mapping = [
-    {x: "🙁", value: vals[0]},
-    {x: "😐", value: vals[1]},
-    {x: "🙂", value: vals[2]}
-  ];
-  console.log(mapping)
-  // create a pie chart and set the data
-  chart = anychart.pie(mapping);
-  chart.palette(["#FF0000", "#FAF9F6", "#008000"]);
-  // set title
-  chart.title("Mood Levels by Community Percentage");
-  // set the container id
-  chart.container("container");
-  // initiate drawing the chart
-  chart.draw();
-  });
-}
-
-  function addStaticVisCommunityStress() {
-    firebase.database().ref('robotapi/communityStress').on('value', (snap)=>{
-        
-        console.log("stress")
-        console.log(snap.val())
-        let total = 0;
-        let data = snap.val();
-        console.log("data")
-        console.log(data)
-        console.log("total")
-        for (let i = 0; i < data.length; i++) {
-          total += data[i];
-        }
-        console.log(total)
-        console.log("med")
-        let med = (data[0] * total);
-        console.log(med)
-        console.log("low")
-        let low = (data[1] * total);
-        console.log(low)
-        console.log("high")
-        let high = (data[2] * total);
-        console.log(high)
-        console.log("arr")
-        let arr = [low, med, high];
-        console.log(arr)
-        console.log("PIE DICTIONARY")
-        let keys = Object.keys(arr);
-        let vals = Object.values(arr);
-        console.log(keys)
-        console.log(vals)
-        var mapping = [
-          // order of firebase
-          {x: "🙂", value: vals[0]},
-          {x: "😐", value: vals[1]},
-          {x: "🙁", value: vals[2]}
-        ];
-        console.log(mapping)
-        // create a pie chart and set the data
-        chart = anychart.pie(mapping);
-        chart.palette(["#008000", "#FAF9F6", "#FF0000"]);
-        // set title
-        chart.title("Stress Levels by Community Percentage");
-        // set the container id
-        chart.container("container");
-        // initiate drawing the chart
-        chart.draw();
-      });
+function addViz(viz) {
+    if (!("visualizations" in bellyScreens[selectedBellyScreen])) {
+      bellyScreens[selectedBellyScreen]["visualizations"] = {list:[]}
     }
 
-function addStaticVisWeeklyStress() {
-    // get data from firebase
-    firebase.database().ref('robotapi/weeklyStress').on('value', (snap)=>{
-      console.log(snap.val())
-      // create a line chart and set the data
-      chart = anychart.line(snap.val());
-      // set title
-      chart.title('Weekly Stress');
-      // set the x axis title
-      chart.xAxis().title('Days: 0 as Sun, 1 as Mon, 2 as Tue, 3 as Wed, 4 as Thur, 5 as Fri, 6 as Sat');
-      // set the y axis title
-      chart.yAxis().title('Stress levels');
-      // set the container id
-      chart.container("container");
-      // initiate drawing the chart
-      chart.draw();
-    });
+    bellyScreens[selectedBellyScreen].visualizations.list.push(viz)
+    var dir = 'robots/' + currentRobot + '/customAPI/inputs/';
+    var dbRef = firebase.database().ref(dir);
+    dbRef.update({ bellyScreens: bellyScreens });
 }
-
-function addStaticVisWeeklyMood() {
-    // get data from firebase
-    firebase.database().ref('robotapi/weeklyMood').on('value', (snap)=>{
-      console.log("CHART DICTIONARY")
-      console.log(snap.val())
-      // create a line chart and set the data
-      chart = anychart.line(snap.val());
-      // set title
-      chart.title('Weekly Moods');
-      // set the x axis title
-      chart.xAxis().title('Days: 0 as Sun, 1 as Mon, 2 as Tue, 3 as Wed, 4 as Thur, 5 as Fri, 6 as Sat');
-      // set the y axis title
-      chart.yAxis().title('Mood levels');
-      // set the container id
-      chart.container("container");
-      // initiate drawing the chart
-      chart.draw();
-    });
-  }
 
 function uploadImage(target, index) {
   console.log(target, index);

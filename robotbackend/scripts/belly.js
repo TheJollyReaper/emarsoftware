@@ -345,10 +345,7 @@ function renderBellyScreen(newScreenIndex, Belly, screenDivId = 'screenDiv') {
 
     /*********
            Icons
-          *********/
-
-    
-           
+          *********/     
     if (screen.icons && screen.icons.list) {
       // bellyHTML += "<div style='flex-direction: row'>";
       screen.icons.list.forEach((element) => {
@@ -360,6 +357,180 @@ function renderBellyScreen(newScreenIndex, Belly, screenDivId = 'screenDiv') {
       // bellyHTML += '</div>';
     }
 
+    /*********
+           vizualizations
+          *********/
+    
+    // var id = Belly.currentScreen;
+    // console.log(id);
+    // html_string = "<div id=' + id + '/>";
+    // console.log(html_string);
+
+    // bellyHTML += html_string;
+    bellyHTML += "<div id='turkey0'</div>";
+    // console.log("id");
+    
+    // bellyHTML += "<div id ='turkey0'/>"
+    console.log("turkey" + Belly.currentScreen)
+
+    if (screen.visualizations && screen.visualizations.list) {
+      screen.visualizations.list.forEach((element) => {
+        console.log(element);
+        if (element == 'community_stress') {
+          addStaticVisCommunityStress();
+        } else if (element == 'community_mood') {
+          addStaticVisCommunityMood();
+        } else if (element == 'weekly_stress') {
+          addStaticVisWeeklyStress();
+        } else if (element == 'weekly_mood') {
+          addStaticVisWeeklyMood();
+        }
+      })
+    }
+    
+    
+    
+    function addStaticVisCommunityMood() {
+      firebase.database().ref('robotapi/communityMood').on('value', (snap)=>{
+      console.log("moods")
+      console.log(snap.val())
+      let total = 0;
+      let data = snap.val();
+      console.log("data")
+      console.log(data)
+      console.log("total")
+      for (let i = 0; i < data.length; i++) {
+        total += data[i];
+      }
+      console.log(total)
+      console.log("low")
+      let low = (data[0] * total);
+      console.log(low)
+      console.log("med")
+      let med = (data[1] * total);
+      console.log(med)
+      console.log("high")
+      let high = (data[2] * total);
+      console.log(high)
+      console.log("arr")
+      let arr = [low, med, high];
+      console.log(arr)
+      console.log("PIE DICTIONARY")
+      let keys = Object.keys(arr);
+      let vals = Object.values(arr);
+      console.log(keys)
+      console.log(vals)
+      var mapping = [
+        {x: "🙁", value: vals[0]},
+        {x: "😐", value: vals[1]},
+        {x: "🙂", value: vals[2]}
+      ];
+      console.log(mapping)
+      // create a pie chart and set the data
+      chart = anychart.pie(mapping);
+      chart.palette(["#FF0000", "#FAF9F6", "#008000"]);
+      // set title
+      chart.title("Mood Levels by Community Percentage");
+      // set the container id
+      chart.container("turkey0");
+      // initiate drawing the chart
+      chart.draw();
+    
+      bellyScreens
+      });
+    }
+    
+      function addStaticVisCommunityStress() {
+
+    
+        firebase.database().ref('robotapi/communityStress').on('value', (snap)=>{
+            
+            console.log("stress")
+            console.log(snap.val())
+            let total = 0;
+            let data = snap.val();
+            console.log("data")
+            console.log(data)
+            console.log("total")
+            for (let i = 0; i < data.length; i++) {
+              total += data[i];
+            }
+            console.log(total)
+            console.log("med")
+            let med = (data[0] * total);
+            console.log(med)
+            console.log("low")
+            let low = (data[1] * total);
+            console.log(low)
+            console.log("high")
+            let high = (data[2] * total);
+            console.log(high)
+            console.log("arr")
+            let arr = [low, med, high];
+            console.log(arr)
+            console.log("PIE DICTIONARY")
+            let keys = Object.keys(arr);
+            let vals = Object.values(arr);
+            console.log(keys)
+            console.log(vals)
+            var mapping = [
+              // order of firebase
+              {x: "🙂", value: vals[0]},
+              {x: "😐", value: vals[1]},
+              {x: "🙁", value: vals[2]}
+            ];
+            console.log(mapping)
+            // create a pie chart and set the data
+            chart = anychart.pie(mapping);
+            chart.palette(["#008000", "#FAF9F6", "#FF0000"]);
+            // set title
+            chart.title("Stress Levels by Community Percentage");
+            // set the container id
+            chart.container("turkey0");
+
+            // initiate drawing the chart
+            chart.draw();
+          });
+        }
+    
+    function addStaticVisWeeklyStress() {
+        // get data from firebase
+        firebase.database().ref('robotapi/weeklyStress').on('value', (snap)=>{
+          console.log(snap.val())
+          // create a line chart and set the data
+          chart = anychart.line(snap.val());
+          // set title
+          chart.title('Weekly Stress');
+          // set the x axis title
+          chart.xAxis().title('Days: 0 as Sun, 1 as Mon, 2 as Tue, 3 as Wed, 4 as Thur, 5 as Fri, 6 as Sat');
+          // set the y axis title
+          chart.yAxis().title('Stress levels');
+          // set the container id
+          chart.container("turkey" + Belly.currentScreen.toString());
+          // initiate drawing the chart
+          chart.draw();
+        });
+    }
+    
+    function addStaticVisWeeklyMood() {
+        // get data from firebase
+        firebase.database().ref('robotapi/weeklyMood').on('value', (snap)=>{
+          console.log("CHART DICTIONARY")
+          console.log(snap.val())
+          // create a line chart and set the data
+          chart = anychart.line(snap.val());
+          // set title
+          chart.title('Weekly Moods');
+          // set the x axis title
+          chart.xAxis().title('Days: 0 as Sun, 1 as Mon, 2 as Tue, 3 as Wed, 4 as Thur, 5 as Fri, 6 as Sat');
+          // set the y axis title
+          chart.yAxis().title('Mood levels');
+          // set the container id
+          chart.container("turkey0");
+          // initiate drawing the chart
+          chart.draw();
+        });
+      }
     
     /*********
            Images
